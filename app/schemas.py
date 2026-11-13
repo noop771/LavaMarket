@@ -15,3 +15,8 @@ class ProductResponse(ProductBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+class ProductUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=255)
+    price: float | None = Field(default=None, gt=0)
+    stock_quantity: int | None = Field(default=None, ge=0)
