@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class ProductBase(BaseModel):
@@ -20,3 +20,20 @@ class ProductUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=255)
     price: float | None = Field(default=None, gt=0)
     stock_quantity: int | None = Field(default=None, ge=0)
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=8, max_length=72)
+
+
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr
+    is_active: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
