@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends,HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_current_admin
 from app.db import get_db
 from app.models import Product, User
 from app.schemas import ProductCreate, ProductResponse, ProductUpdate
@@ -20,7 +20,7 @@ async def get_products(db: AsyncSession = Depends(get_db)):
 async def create_product(
     product_in: ProductCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_admin)
 ):
     product = Product(**product_in.model_dump())
     db.add(product)
@@ -43,7 +43,7 @@ async def update_product(
     product_id: int,
     product_in: ProductUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_admin)
 ):
     product = await db.get(Product, product_id)
     if product is None:
@@ -61,7 +61,7 @@ async def update_product(
 async def delete_product(
     product_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_admin)
 ):
     product = await db.get(Product, product_id)
     if product is None:
