@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends,HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.dependencies import get_current_user
 from app.db import get_db
-from app.models import Product
+from app.models import Product, User
 from app.schemas import ProductCreate, ProductResponse, ProductUpdate
 
 router = APIRouter(prefix="/products", tags=["products"])
@@ -19,6 +20,7 @@ async def get_products(db: AsyncSession = Depends(get_db)):
 async def create_product(
     product_in: ProductCreate,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     product = Product(**product_in.model_dump())
     db.add(product)
@@ -29,7 +31,7 @@ async def create_product(
 @router.get("/{product_id}", response_model=ProductResponse)
 async def get_product(
     product_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db)
 ):
     product = await db.get(Product, product_id)
     if product is None:
@@ -41,6 +43,7 @@ async def update_product(
     product_id: int,
     product_in: ProductUpdate,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     product = await db.get(Product, product_id)
     if product is None:
@@ -58,6 +61,7 @@ async def update_product(
 async def delete_product(
     product_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     product = await db.get(Product, product_id)
     if product is None:
