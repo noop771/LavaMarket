@@ -37,3 +37,16 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+class CartItemCreate(BaseModel):
+    product_id: int
+    quantity: int = Field(default=1, gt=0)
+
+
+class CartItemResponse(BaseModel):
+    id: int
+    product_id: int
+    quantity: int
+    product: ProductResponse
+
+    model_config = ConfigDict(from_attributes=True)

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, String, func, text
+from sqlalchemy import DateTime, ForeignKey, Numeric, String, UniqueConstraint, func, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -61,4 +61,17 @@ class OrderItem(Base):
     price_at_purchase: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
 
     order: Mapped["Order"] = relationship(back_populates="items")
+    product: Mapped["Product"] = relationship()
+
+class CartItem(Base):
+    __tablename__ = "cart_items"
+    __table_args__ = (
+        UniqueConstraint("user_id", "product_id", name="uq_user_product_cart"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False)
+    quantity: Mapped[int] = mapped_column(default=1, nullable=False)
+
     product: Mapped["Product"] = relationship()
