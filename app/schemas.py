@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from datetime import datetime
+from typing import Literal
 
 
 class ProductBase(BaseModel):
@@ -70,3 +71,6 @@ class OrderResponse(BaseModel):
     items: list[OrderItemResponse]
 
     model_config = ConfigDict(from_attributes=True)
+
+class OrderStatusUpdate(BaseModel):
+    status: Literal["created", "cooking", "delivered", "cancelled"]

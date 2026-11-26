@@ -6,9 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.db import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_current_admin
 from app.models import CartItem, Order, OrderItem, User
-from app.schemas import OrderResponse
+from app.schemas import OrderResponse, OrderStatusUpdate
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -76,3 +76,24 @@ async def read_orders(
     )
 
     return result.scalars().all()
+
+@router.patch("/{order_id}/status", response_model=OrderResponse)
+async def update_order_status(
+    order_id: int,
+    status_in: OrderStatusUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
+    order = await db.get(Order, order_id)
+    if order is None:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    order.status = status_in.status
+    await db.commit()
+
+    loaded = await db.execute(
+        select(Order)
+        .options(selectinload(Order.items))
+        .where(Order.id == order.id)
+    )
+    return loaded.scalars().first()
