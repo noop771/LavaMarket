@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from datetime import datetime
 
 
 class ProductBase(BaseModel):
@@ -48,5 +49,24 @@ class CartItemResponse(BaseModel):
     product_id: int
     quantity: int
     product: ProductResponse
+
+    model_config = ConfigDict(from_attributes=True)
+
+class OrderItemResponse(BaseModel):
+    id: int
+    product_id: int
+    quantity: int
+    price_at_purchase: float
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class OrderResponse(BaseModel):
+    id: int
+    user_id: int
+    status: str
+    total_price: float
+    created_at: datetime
+    items: list[OrderItemResponse]
 
     model_config = ConfigDict(from_attributes=True)
